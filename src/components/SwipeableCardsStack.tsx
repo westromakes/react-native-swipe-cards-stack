@@ -168,10 +168,7 @@ const SwipeableCardsStack: React.FC<SwipeableCardsStackProps> = (props) => {
 
   // Render cards
   const renderCards = useCallback(() => {
-    console.log('renderCards - currentIndex:', currentIndex, 'data.length:', data.length);
-    
     if (currentIndex >= data.length) {
-      console.log('Empty state - emptyComponent:', !!emptyComponent);
       // Use custom empty component if provided, otherwise show nothing
       if (emptyComponent) {
         return emptyComponent();
