@@ -1,6 +1,6 @@
 {
   "name": "react-native-swipe-cards-stack",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "A highly customizable, performant swipeable cards stack component for React Native.",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
