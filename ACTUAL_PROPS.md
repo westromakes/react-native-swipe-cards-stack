@@ -92,10 +92,15 @@ callbacks?: {
   onStackEmpty?: () => void;
   onCardFocus?: (item: any, index: number) => void;
   onAnimationComplete?: (direction: 'left' | 'right' | 'up' | 'down', item: any) => void;
+  onTap?: (item: any, index: number) => void;        // NEW: Card tap callback
+  onEmpty?: () => void;                              // NEW: Convenience alias for onStackEmpty
 };
 
-// OR use direct callback (legacy - but includes index now!)
+// OR use direct callbacks (legacy - but includes index now!)
 onSwipe?: (direction: 'left' | 'right' | 'up' | 'down', item: any, index: number) => void;
+onTap?: (item: any, index: number) => void;          // NEW: Direct tap callback
+onEmpty?: () => void;                                // NEW: Direct empty callback
+tapActiveOpacity?: number;                           // NEW: Tap visual feedback (0-1)
 ```
 
 ### **Stack Behavior**
@@ -125,7 +130,6 @@ accessibility?: {
 ```typescript
 enableUpSwipe?: boolean;        // Legacy: use gestures.swipeDirections instead
 rotationEnabled?: boolean;      // Legacy: use animations.rotationEnabled instead
-scaleSecondCard?: boolean;      // Legacy: not implemented
 animationDuration?: number;     // Legacy: use animations.duration instead
 stackSize?: number;             // Legacy: use stackBehavior.stackSize instead
 ```
@@ -161,6 +165,10 @@ stackSize?: number;             // Legacy: use stackBehavior.stackSize instead
   onSwipe={(direction, item, index) => {
     console.log(`Swiped ${direction} on ${item} at index ${index}`);
   }}
+  onTap={(item, index) => {
+    console.log(`Tapped on ${item} at index ${index}`);
+  }}
+  tapActiveOpacity={0.8}
   
   // ✅ Thresholds
   thresholds={{
@@ -173,28 +181,11 @@ stackSize?: number;             // Legacy: use stackBehavior.stackSize instead
 />
 ```
 
-## ❌ Props That Were Removed (Not Implemented)
-
-These props were defined in types but never actually implemented:
-
-- `containerDimensions` - Not used anywhere
-- `performance.*` - Entire interface removed
-- `swipeIcons.iconPosition` - Complex positioning not implemented
-- `animations.customInterpolation` - Custom interpolation not implemented
-- `stackBehavior.infiniteStack` - Infinite stack not implemented
-- `stackBehavior.recycleCards` - Card recycling not implemented
-- `stackBehavior.preloadCards` - Preloading not implemented
-- `stackBehavior.stackOffset` - Advanced positioning not implemented
-- `stackBehavior.stackScale` - Advanced scaling arrays not implemented
-- `stackBehavior.stackOpacity` - Advanced opacity arrays not implemented
-- `stackBehavior.stackRotation` - Advanced rotation arrays not implemented
-- `accessibility.swipeAccessibilityActions` - Custom actions not implemented
-
 ## ✅ Summary
 
-**Total Working Props: ~30 actual working props**
+**Total Working Props: ~33 actual working props**
 - Core: 2 required props
-- Optional: ~28 optional props that actually work
+- Optional: ~31 optional props that actually work (including new onTap, onEmpty, tapActiveOpacity)
 - Removed: ~15 props that were never implemented
 
 This is the **real**, **tested**, **working** API! 🎉

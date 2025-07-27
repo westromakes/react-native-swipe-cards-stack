@@ -4,8 +4,18 @@
 
 ```tsx
 import React, { useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import { SwipeableCardsStack } from 'react-native-swipe-cards-stack';
+
+const { width, height } = Dimensions.get('window');
+
+const TickIcon = (props: any) => (
+  // icon for right swipe
+)
+
+const CloseIcon = (props: any) => (
+  // icon for left swipe
+)
 
 const Example = () => {
   const [cards] = useState([
@@ -22,13 +32,15 @@ const Example = () => {
     </View>
   );
 
+  // custom empty component
+  const emptyComponent = () => (
+    <View style={styles.emptyView}>
+      <Text style={styles.emptyText}>No more cards</Text>
+    </View>
+  );
+
   const handleSwipe = (direction, card, index) => {
-    console.log(`Swiped ${direction}:`, card.name);
-    if (direction === 'up') {
-      console.log('Up swipe detected for:', card.name);
-      // Navigate to detail screen, show modal, or any custom action
-      // navigation.navigate('UserProfile', { user: card });
-    }
+    console.log(`Swiped ${index} card on direction ${direction}:`, card.name);
   };
 
   return (
@@ -38,17 +50,16 @@ const Example = () => {
         renderCard={renderCard}
         onSwipe={handleSwipe}
         cardDimensions={{
-          width: 300,
-          height: 400,
-        }}
-        swipeIcons={{
-          showTickIcon: true,
-          showCrossIcon: true,
-          showUpIcon: true,
+            width: width * 0.8,
+            height: height * 0.5,
         }}
         gestures={{
-          enableUpSwipe: true,
+            swipeDirections: ['left', 'right'], // Only allow left and right swipes
+            allowPartialSwipe: true,
         }}
+        rightSwipeIcon={<TickIcon width={70} height={70} />}
+        leftSwipeIcon={<CloseIcon width={70} height={70} />}
+        emptyComponent={emptyComponent}
       />
     </View>
   );
@@ -84,6 +95,16 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#888',
   },
+  emptyView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyText: {
+    fontSize: 16,
+    textAlign: 'center',
+    color: '#888',
+  },
 });
 
 export default Example;
@@ -91,47 +112,6 @@ export default Example;
 
 ## Key Changes
 
-✅ **Removed Modal Functionality**: No more built-in modal system
-✅ **Added `onUpSwipe` Callback**: Clean callback for up swipe gestures
-✅ **Improved Flexibility**: Users implement their own modals/navigation
+✅ **Added `onTap` Callback**: Clean callback for tap gesture
 ✅ **Backward Compatible**: Legacy props still supported
 ✅ **Type Safe**: Full TypeScript support maintained
-
-## Migration
-
-If you were using the modal functionality:
-
-**Before:**
-```tsx
-<SwipeableCardsStack
-  data={cards}
-  renderCard={renderCard}
-  modal={{ enableModal: true }}
-  renderModal={myModalRender}
-/>
-```
-
-**After:**
-```tsx
-const [showModal, setShowModal] = useState(false);
-const [selectedCard, setSelectedCard] = useState(null);
-
-<SwipeableCardsStack
-  data={cards}
-  renderCard={renderCard}
-  onSwipe={(direction, card, index) => {
-    if (direction === 'up') {
-      setSelectedCard(card);
-      setShowModal(true);
-    }
-  }}
-/>
-
-{/* Your custom modal implementation */}
-{showModal && (
-  <CustomModal 
-    card={selectedCard}
-    onClose={() => setShowModal(false)}
-  />
-)}
-```

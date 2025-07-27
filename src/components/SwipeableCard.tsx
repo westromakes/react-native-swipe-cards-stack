@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo } from 'react';
-import { Animated, PanResponder, StyleSheet, Dimensions } from 'react-native';
+import { Animated, PanResponder, StyleSheet, Dimensions, TouchableOpacity, View } from 'react-native';
 import { SwipeableCardData, SwipeIcons, SwipeThresholds, SwipeAnimations, SwipeGestures, SwipeCallbacks } from '../types';
 import { getDirectionFromGesture } from '../utils';
 import SwipeIconsRenderer from './SwipeIconsRenderer';
@@ -12,6 +12,8 @@ export interface SwipeableCardProps {
   isTop: boolean;
   isActive: boolean;
   onSwipe: (direction: 'left' | 'right' | 'up' | 'down', card: SwipeableCardData, index: number) => void;
+  onTap?: (item: SwipeableCardData, index: number) => void;
+  tapActiveOpacity?: number;
   animatedValue: Animated.ValueXY;
   cardStyle?: any;
   swipeIcons?: SwipeIcons;
@@ -40,6 +42,8 @@ const SwipeableCard: React.FC<SwipeableCardProps> = ({
   isTop,
   isActive,
   onSwipe,
+  onTap,
+  tapActiveOpacity = 1,
   animatedValue,
   cardStyle,
   swipeIcons,
@@ -279,6 +283,21 @@ const SwipeableCard: React.FC<SwipeableCardProps> = ({
     },
   ];
 
+  const handleTap = useCallback(() => {
+    if (onTap) {
+      onTap(card, index);
+    }
+  }, [onTap, card, index]);
+
+  const CardWrapper = onTap ? TouchableOpacity : View as any;
+  const cardWrapperProps = onTap 
+    ? {
+        onPress: handleTap,
+        activeOpacity: tapActiveOpacity,
+        disabled: false,
+      }
+    : {};
+
   return (
     <Animated.View
       style={cardStyles}
@@ -288,7 +307,15 @@ const SwipeableCard: React.FC<SwipeableCardProps> = ({
       accessibilityLabel={`Card ${index + 1}`}
       accessibilityHint="Swipe left or right to navigate, swipe up for details"
     >
-      {children}
+      <CardWrapper
+        style={{
+          width: '100%',
+          height: '100%',
+        }}
+        {...cardWrapperProps}
+      >
+        {children}
+      </CardWrapper>
       
       {/* Render swipe icons */}
       {isTop && (

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Animated, StyleSheet } from 'react-native';
+import { Animated } from 'react-native';
 import { SwipeIcons } from '../types';
 
 interface SwipeIconsRendererProps {
@@ -73,14 +73,12 @@ const SwipeIconsRenderer: React.FC<SwipeIconsRendererProps> = ({
   const getFinalIconStyle = (direction: 'left' | 'right' | 'up' | 'down') => {
     const baseStyle = {
       position: 'absolute' as const,
-      zIndex: 1000,
       top: '50%',
       left: '50%',
-      justifyContent: 'center',
-      alignItems: 'center',
-      // Default centering - will be overridden if custom style provides different positioning
-      marginTop: -25,  // Reasonable default for typical icon sizes
-      marginLeft: -25,
+      justifyContent: 'center' as const,
+      alignItems: 'center' as const,
+      marginTop: -35,  // Half of typical icon size
+      marginLeft: -35,
     };
 
     switch (direction) {
@@ -90,8 +88,7 @@ const SwipeIconsRenderer: React.FC<SwipeIconsRendererProps> = ({
           directIcons?.leftSwipeIconStyle || 
           swipeIcons.leftSwipeIconStyle || 
           swipeIcons.leftIconStyle || 
-          swipeIcons.crossIconStyle || 
-          styles.defaultIconContainer
+          swipeIcons.crossIconStyle
         ];
       case 'right':
         return [
@@ -99,36 +96,25 @@ const SwipeIconsRenderer: React.FC<SwipeIconsRendererProps> = ({
           directIcons?.rightSwipeIconStyle || 
           swipeIcons.rightSwipeIconStyle || 
           swipeIcons.rightIconStyle || 
-          swipeIcons.tickIconStyle || 
-          styles.defaultIconContainer
+          swipeIcons.tickIconStyle
         ];
       case 'up':
         return [
           baseStyle,
           directIcons?.upSwipeIconStyle || 
           swipeIcons.upSwipeIconStyle || 
-          swipeIcons.upIconStyle || 
-          styles.defaultIconContainer
+          swipeIcons.upIconStyle
         ];
       case 'down':
         return [
           baseStyle,
           directIcons?.downSwipeIconStyle || 
           swipeIcons.downSwipeIconStyle || 
-          swipeIcons.downIconStyle || 
-          styles.defaultIconContainer
+          swipeIcons.downIconStyle
         ];
       default:
-        return [baseStyle, styles.defaultIconContainer];
+        return [baseStyle];
     }
-  };
-
-  // Calculate final opacities based on enabled directions
-  const finalOpacities = {
-    left: enabledDirections.left ? iconOpacities.leftOpacity || iconOpacities.crossOpacity : 0,
-    right: enabledDirections.right ? iconOpacities.rightOpacity || iconOpacities.tickOpacity : 0,
-    up: enabledDirections.up ? iconOpacities.upOpacity : 0,
-    down: enabledDirections.down ? iconOpacities.downOpacity : 0,
   };
 
   return (
@@ -138,8 +124,11 @@ const SwipeIconsRenderer: React.FC<SwipeIconsRendererProps> = ({
         <Animated.View 
           style={[
             getFinalIconStyle('left'),
-            { opacity: finalOpacities.left }
+            { 
+              opacity: enabledDirections.left ? iconOpacities.leftOpacity || iconOpacities.crossOpacity : 0
+            }
           ]}
+          pointerEvents="none"
         >
           {getFinalIcon('left')}
         </Animated.View>
@@ -150,8 +139,11 @@ const SwipeIconsRenderer: React.FC<SwipeIconsRendererProps> = ({
         <Animated.View 
           style={[
             getFinalIconStyle('right'),
-            { opacity: finalOpacities.right }
+            { 
+              opacity: enabledDirections.right ? iconOpacities.rightOpacity || iconOpacities.tickOpacity : 0
+            }
           ]}
+          pointerEvents="none"
         >
           {getFinalIcon('right')}
         </Animated.View>
@@ -162,8 +154,11 @@ const SwipeIconsRenderer: React.FC<SwipeIconsRendererProps> = ({
         <Animated.View 
           style={[
             getFinalIconStyle('up'),
-            { opacity: finalOpacities.up }
+            { 
+              opacity: enabledDirections.up ? iconOpacities.upOpacity : 0
+            }
           ]}
+          pointerEvents="none"
         >
           {getFinalIcon('up')}
         </Animated.View>
@@ -174,8 +169,11 @@ const SwipeIconsRenderer: React.FC<SwipeIconsRendererProps> = ({
         <Animated.View 
           style={[
             getFinalIconStyle('down'),
-            { opacity: finalOpacities.down }
+            { 
+              opacity: enabledDirections.down ? iconOpacities.downOpacity : 0
+            }
           ]}
+          pointerEvents="none"
         >
           {getFinalIcon('down')}
         </Animated.View>
@@ -183,72 +181,5 @@ const SwipeIconsRenderer: React.FC<SwipeIconsRendererProps> = ({
     </>
   );
 };
-
-const styles = StyleSheet.create({
-  defaultIconContainer: {
-    // Base positioning and centering is now handled in baseStyle
-    // This is just for any additional default styling
-  },
-  iconContainer: {
-    position: 'absolute',
-    zIndex: 1000,
-  },
-  centerPosition: {
-    // Legacy - base centering is now in baseStyle
-  },
-  defaultIcon: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.5,
-    shadowRadius: 6,
-    elevation: 10,
-    borderWidth: 3,
-    borderColor: '#fff',
-  },
-  tickIcon: {
-    // Custom styles can be applied via swipeIcons.tickIconStyle
-  },
-  tickCircle: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 40,
-    backgroundColor: '#4CAF50',
-  },
-  crossIcon: {
-    // Custom styles can be applied via swipeIcons.crossIconStyle
-  },
-  crossCircle: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 40,
-    backgroundColor: '#F44336',
-  },
-  upIcon: {
-    // Custom styles can be applied via swipeIcons.upIconStyle
-  },
-  upCircle: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 40,
-    backgroundColor: '#2196F3',
-  },
-  downIcon: {
-    // Custom styles can be applied via swipeIcons.downIconStyle
-  },
-  downCircle: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 40,
-    backgroundColor: '#FF9800',
-  },
-});
 
 export default React.memo(SwipeIconsRenderer);

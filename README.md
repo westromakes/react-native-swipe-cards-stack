@@ -15,6 +15,7 @@ A highly customizable, performant swipeable cards stack component for React Nati
 - 🚀 **High Performance** - Built with React Native's Animated API and optimized for 60fps
 - 🎨 **Fully Customizable** - Every aspect can be customized to match your design
 - 📱 **Multi-directional Swiping** - Support for left, right, up, and down swipe gestures
+- 👆 **Tap Interactions** - Built-in tap handling with customizable visual feedback
 - 🎭 **Rich Animations** - Smooth rotation, scaling, and opacity animations
 - 🎯 **TypeScript Ready** - Complete type definitions included
 - 🔧 **Zero Dependencies** - Built with React Native core components only
@@ -58,6 +59,8 @@ const App = () => {
       data={cards}
       renderCard={renderCard}
       onSwipe={(direction, item, index) => console.log(`Swiped ${direction} on item at index ${index}:`, item)}
+      onTap={(item, index) => console.log(`Tapped on card at index ${index}:`, item)}
+      tapActiveOpacity={0.8}
     />
   );
 };
@@ -124,6 +127,32 @@ const mixedCards = ['string', 42, { name: 'object' }, [1, 2, 3]];
 
 ## 🎯 Advanced Usage
 
+### Card Tap Interactions
+
+```tsx
+import { SwipeableCardsStack } from 'react-native-swipe-cards-stack';
+
+const InteractiveCards = () => {
+  const handleCardTap = (card, index) => {
+    console.log(`Card tapped at index ${index}:`, card);
+    // Navigate to detail view, show modal, etc.
+    // navigation.navigate('CardDetails', { card });
+  };
+
+  return (
+    <SwipeableCardsStack
+      data={cardData}
+      renderCard={renderCard}
+      onTap={handleCardTap}
+      tapActiveOpacity={0.7} // Visual feedback on tap
+      onSwipe={(direction, card, index) => {
+        console.log(`Swiped ${direction}:`, card);
+      }}
+    />
+  );
+};
+```
+
 ### Custom Icons and Animations
 
 ```tsx
@@ -140,11 +169,8 @@ const CustomCard = () => {
     <SwipeableCardsStack
       data={cardData}
       renderCard={renderCard}
-      swipeIcons={{
-        tickIcon: customTickIcon,
-        showTickIcon: true,
-        iconPosition: 'top',
-      }}
+      rightSwipeIcon={customTickIcon}
+      // rightIconStyle={styles.rightIconStyle} icon container styles eg: {position: 'absolute', top: 10}
       animations={{
         duration: 250,
         rotationEnabled: true,
@@ -209,6 +235,11 @@ const MyCardsWithDetails = () => {
 <SwipeableCardsStack
   data={cardData}
   renderCard={renderCard}
+  onTap={(card, index) => {
+    console.log(`Card ${index} tapped:`, card);
+    // Navigate to detail view or show modal
+  }}
+  tapActiveOpacity={0.8}
   callbacks={{
     onSwipe: (direction, card, index) => {
       console.log(`Card ${index} swiped ${direction}`);
@@ -235,11 +266,11 @@ const MyCardsWithDetails = () => {
 
 This package has been cleaned up to only include props that actually work. The complete API includes:
 
-- **Core Props**: `data`, `renderCard`, `keyExtractor`
+- **Core Props**: `data`, `renderCard`, `keyExtractor`, `onTap`, `tapActiveOpacity`
 - **Styling**: `cardStyle`, `containerStyle`, `activeCardStyle`, `inactiveCardStyle`, `cardDimensions`
 - **Icons**: `leftSwipeIcon`, `rightSwipeIcon`, `upSwipeIcon`, `downSwipeIcon` + styles
 - **Gestures**: `swipeDirections`, `allowPartialSwipe`, `enableRotation`, etc.
-- **Callbacks**: `onSwipe`, `onSwipeStart`, `onSwipeEnd`, `onStackEmpty`, etc.
+- **Callbacks**: `onSwipe`, `onSwipeStart`, `onSwipeEnd`, `onStackEmpty`, `onTap`, etc.
 - **Control**: `resetTrigger`, `currentIndex`, `onIndexChange`
 - **Configuration**: `thresholds`, `animations`, `stackBehavior`, `accessibility`
 
@@ -250,6 +281,8 @@ This package has been cleaned up to only include props that actually work. The c
 | `data` | `SwipeableCardData[]` | **Required** | Array of card data |
 | `renderCard` | `(card, index, isActive) => ReactNode` | **Required** | Function to render each card |
 | `keyExtractor` | `(card, index) => string` | `card.id` | Extract unique key for each card |
+| `onTap` | `(card, index) => void` | `undefined` | Callback when card is tapped |
+| `tapActiveOpacity` | `number` | `1` | Opacity when card is pressed (0-1) |
 
 ### Styling Props
 
@@ -264,19 +297,14 @@ This package has been cleaned up to only include props that actually work. The c
 
 ```tsx
 interface SwipeIcons {
-  tickIcon?: React.ReactNode;           // Custom right swipe icon
-  crossIcon?: React.ReactNode;          // Custom left swipe icon
-  upIcon?: React.ReactNode;             // Custom up swipe icon
-  showTickIcon?: boolean;               // Show tick on right swipe
-  showCrossIcon?: boolean;              // Show cross on left swipe
-  showUpIcon?: boolean;                 // Show icon on up swipe
-  iconPosition?: 'center' | 'top' | 'bottom' | 'custom';
-  customIconPosition?: {                // Custom positioning
-    top?: number | string;
-    left?: number | string;
-    right?: number | string;
-    bottom?: number | string;
-  };
+  leftSwipeIcon?: React.ReactNode;
+  rightSwipeIcon?: React.ReactNode;
+  upSwipeIcon?: React.ReactNode;
+  downSwipeIcon?: React.ReactNode;
+  leftSwipeIconStyle?: any;
+  rightSwipeIconStyle?: any;
+  upSwipeIconStyle?: any;
+  downSwipeIconStyle?: any;
 }
 ```
 
@@ -358,6 +386,7 @@ interface SwipeCallbacks {
   onStackEmpty?: () => void;
   onCardFocus?: (card, index) => void;
   onAnimationComplete?: (direction, card) => void;
+  onTap?: (card, index) => void;          // NEW: Card tap callback
 }
 ```
 
@@ -367,94 +396,24 @@ interface SwipeCallbacks {
 
 ```tsx
 <SwipeableCardsStack
-  data={profiles}
-  renderCard={renderProfile}
-  swipeIcons={{
-    tickIcon: <HeartIcon />,
-    crossIcon: <XIcon />,
-    showTickIcon: true,
-    showCrossIcon: true,
-    iconPosition: 'center',
-  }}
-  animations={{
-    duration: 300,
-    rotationEnabled: true,
-  }}
-  gestures={{
-    enableLeftSwipe: true,
-    enableRightSwipe: true,
-    enableUpSwipe: true,
-  }}
-/>
-```
-
-### Card Game Style
-
-```tsx
-<SwipeableCardsStack
-  data={cards}
-  renderCard={renderGameCard}
-  stackBehavior={{
-    stackSize: 3,
-    stackOffset: { x: 0, y: -20 },
-    stackScale: [1, 0.95, 0.9],
-    stackOpacity: [1, 0.8, 0.6],
-  }}
-  animations={{
-    rotationEnabled: false,
-    scaleEnabled: true,
-  }}
-/>
-```
-
-### Shopping App Style
-
-```tsx
-<SwipeableCardsStack
-  data={products}
-  renderCard={renderProduct}
-  swipeIcons={{
-    tickIcon: <CartIcon />,
-    crossIcon: <TrashIcon />,
-    upIcon: <InfoIcon />,
-    iconPosition: 'bottom',
-  }}
-  gestures={{
-    enableDownSwipe: true, // Remove from cart
-  }}
-  onSwipe={(direction, product, index) => {
-    if (direction === 'up') {
-      // Navigate to product details
-      navigation.navigate('ProductDetails', { product });
-    }
-  }}
-/>
-```
-
-## 🔧 Migration Guide
-
-### From Simple Implementation
-
-If you're migrating from a simple swipeable cards implementation:
-
-```tsx
-// Before
-<SwipeableCards
-  cards={data}
-  onSwipeLeft={handleLeft}
-  onSwipeRight={handleRight}
-/>
-
-// After
-<SwipeableCardsStack
-  data={data}
-  renderCard={renderCard}
-  callbacks={{
-    onSwipe: (direction, card) => {
-      if (direction === 'left') handleLeft(card);
-      if (direction === 'right') handleRight(card);
-    }
-  }}
+    data={profiles}
+    renderCard={renderProfile}
+    callbacks={{
+        onSwipe: handleSwipe,
+        onSwipeStart: (profile, direction) => console.log(`Started swiping ${direction} on ${profile.name}`),
+        onStackEmpty: () => console.log('No more profiles!'),
+    }}
+    cardDimensions={{
+        width: width * 0.8,
+        height: height * 0.5,
+    }}
+    gestures={{
+        swipeDirections: ['left', 'right'], // Only allow left and right swipes
+        allowPartialSwipe: true,
+    }}
+    rightSwipeIcon={customHeartIcon}
+    leftSwipeIcon={customXIcon}
+    emptyComponent={emptyComponent}
 />
 ```
 
@@ -464,7 +423,6 @@ If you're migrating from a simple swipeable cards implementation:
 2. **Memoize your `renderCard` function** to prevent unnecessary re-renders
 3. **Enable `useNativeDriver`** for smoother animations
 4. **Limit `stackSize`** to 2-3 cards for better performance
-5. **Use `removeClippedSubviews`** for large datasets
 
 ## 🐛 Troubleshooting
 
@@ -472,16 +430,19 @@ If you're migrating from a simple swipeable cards implementation:
 
 **Cards not responding to gestures:**
 - Ensure the container has proper dimensions
+- Check direction is added in `swipeDirections` array
 - Check if `gestures.gestureThreshold` is too high
 
 **Icons not showing:**
-- Verify `swipeIcons.showTickIcon` is `true`
-- Check if `thresholds.iconDelay` is appropriate
+- Verify `showLeftIcon` is `true`
+- Check if `leftIconStyle` is appropriate
 
 **Up swipe callback not firing:**
-- Ensure `gestures.enableUpSwipe` is `true`
-- Check if `thresholds.vertical` is appropriate for your use case
-- Handle up swipe in the main `onSwipe` callback: `if (direction === 'up') { ... }`
+- Check direction is added in `swipeDirections` array
+- Check `gestures.allowPartialSwipe` is true
+- Check if `thresholds.vertical` or `thresholds.horizontal` is appropriate for your use case
+- Handle up swipe in the main `onSwipe` callback
+{ ... }`
 
 **Performance issues:**
 - Reduce `stackSize`

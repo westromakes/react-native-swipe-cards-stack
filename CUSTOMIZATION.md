@@ -5,7 +5,7 @@
 ### 🚀 Core Improvements
 
 1. **TypeScript First**: Complete type definitions for all props and configurations
-2. **Performance Optimized**: React.memo, useMemo, useCallback for optimal performance
+2. **Animation Optimized**: Built with React Native's Animated API for smooth 60fps performance
 3. **Accessibility Ready**: Full ARIA support and screen reader compatibility
 4. **Modular Architecture**: Separate components for better maintainability
 
@@ -13,38 +13,57 @@
 
 #### 1. Advanced Swipe Icons
 ```tsx
-swipeIcons={{
-  tickIcon: <CustomHeartIcon />,           // Custom right swipe icon
-  crossIcon: <CustomXIcon />,              // Custom left swipe icon
-  upIcon: <CustomStarIcon />,              // NEW: Up swipe icon
-  showTickIcon: true,
-  showCrossIcon: true,
-  showUpIcon: true,                        // NEW: Show up icon
-  iconPosition: 'top' | 'center' | 'bottom' | 'custom',  // NEW: Icon positioning
-  customIconPosition: {                    // NEW: Custom positioning
-    top: 100,
-    left: '50%',
-    marginLeft: -30,
-  },
-  tickIconStyle: { backgroundColor: 'red' }, // NEW: Icon styling
-  crossIconStyle: { backgroundColor: 'blue' },
-  upIconStyle: { backgroundColor: 'green' },
-}}
+// Direct icon props (new simplified API)
+leftSwipeIcon?: React.ReactNode;         // Custom left swipe icon
+rightSwipeIcon?: React.ReactNode;        // Custom right swipe icon
+upSwipeIcon?: React.ReactNode;           // Custom up swipe icon
+downSwipeIcon?: React.ReactNode;         // Custom down swipe icon
+leftSwipeIconStyle?: any;                // Style for left icon
+rightSwipeIconStyle?: any;               // Style for right icon
+upSwipeIconStyle?: any;                  // Style for up icon
+downSwipeIconStyle?: any;                // Style for down icon
+
+// Example usage
+<SwipeableCardsStack
+  leftSwipeIcon={<CustomRejectIcon />}
+  rightSwipeIcon={<CustomAcceptIcon />}
+  upSwipeIcon={<CustomSuperLikeIcon />}
+  leftSwipeIconStyle={{ backgroundColor: 'red' }}
+  rightSwipeIconStyle={{ backgroundColor: 'green' }}
+  upSwipeIconStyle={{ backgroundColor: 'blue' }}
+  // ... other props
+/>
 ```
 
 #### 2. Gesture Configuration
 ```tsx
 gestures={{
-  enableLeftSwipe: true,
-  enableRightSwipe: true,
-  enableUpSwipe: true,
-  enableDownSwipe: true,                   // NEW: Down swipe support
-  enableRotation: true,
-  enableScale: true,
-  swipeDirections: ['left', 'right', 'up', 'down'], // NEW: Array configuration
-  gestureThreshold: 10,                    // NEW: Sensitivity control
-  simultaneousGestures: false,             // NEW: Multi-gesture support
+  // Primary direction control (new simplified API)
+  swipeDirections: ['left', 'right', 'up', 'down'], // Which directions are enabled
+  
+  // Animation and visual controls
+  enableRotation: true,                    // Enable card rotation during swipe
+  enableScale: true,                       // Enable card scaling during swipe
+  
+  // Advanced gesture settings
+  gestureThreshold: 10,                    // Minimum movement to trigger gesture
+  simultaneousGestures: false,             // Allow multiple gestures at once
+  
+  // Partial swipe behavior
+  allowPartialSwipe: true,                 // Allow partial swipes that spring back
+  partialSwipeReturnDuration: 300,         // Duration for spring-back animation
+  partialSwipeReturnEasing: Easing.back(), // Easing for spring-back
 }}
+
+// Example usage
+<SwipeableCardsStack
+  gestures={{
+    swipeDirections: ['left', 'right'],     // Only horizontal swipes
+    enableRotation: true,
+    allowPartialSwipe: true,
+  }}
+  // ... other props
+/>
 ```
 
 #### 3. Advanced Animations
@@ -80,15 +99,28 @@ stackBehavior={{
 #### 5. Enhanced Callbacks
 ```tsx
 callbacks={{
-  onSwipe: (direction, card, index) => {},
-  onSwipeStart: (card, direction) => {},   // NEW: Swipe start
-  onSwipeEnd: (card, direction) => {},     // NEW: Swipe end
-  onShowModal: (card, index) => {},
-  onHideModal: (card) => {},               // NEW: Modal hide
-  onStackEmpty: () => {},                  // NEW: Empty stack
-  onCardFocus: (card, index) => {},        // NEW: Card focus
-  onAnimationComplete: (direction, card) => {}, // NEW: Animation complete
+  onSwipe: (direction, card, index) => {},         // Card swiped in direction
+  onSwipeStart: (card, direction) => {},           // Swipe gesture started
+  onSwipeEnd: (card, direction) => {},             // Swipe gesture ended
+  onStackEmpty: () => {},                          // All cards swiped
+  onCardFocus: (card, index) => {},                // Card became active
+  onAnimationComplete: (direction, card) => {},    // Swipe animation finished
+  onTap: (card, index) => {},                      // NEW: Card was tapped
+  onEmpty: () => {},                               // NEW: Alias for onStackEmpty
 }}
+
+// OR use direct callbacks
+<SwipeableCardsStack
+  onSwipe={(direction, card, index) => {
+    console.log(`Swiped ${direction} on card ${index}`);
+  }}
+  onTap={(card, index) => {
+    console.log(`Tapped on card ${index}`);
+    // Navigate to detail view, show modal, etc.
+  }}
+  tapActiveOpacity={0.8}                           // Visual feedback on tap
+  // ... other props
+/>
 ```
 
 #### 6. Modal Configuration
@@ -119,19 +151,7 @@ accessibility={{
 }}
 ```
 
-#### 8. Performance Options
-```tsx
-performance={{
-  removeClippedSubviews: true,             // NEW: View recycling
-  shouldRasterizeIOS: true,                // NEW: iOS optimization
-  renderAheadOffset: 100,                  // NEW: Render distance
-  maxToRenderPerBatch: 10,                 // NEW: Batch size
-  updateCellsBatchingPeriod: 50,           // NEW: Update frequency
-  windowSize: 21,                          // NEW: Window size
-}}
-```
-
-#### 9. Advanced Styling
+#### 8. Advanced Styling
 ```tsx
 // Multiple style props for different states
 cardStyle={{}}                           // Base card style
@@ -167,17 +187,28 @@ const [currentIndex, setCurrentIndex] = useState(0);
 <SwipeableCardsStack
   data={profiles}
   renderCard={renderProfile}
-  swipeIcons={{
-    tickIcon: <HeartIcon />,
-    crossIcon: <XIcon />,
-    iconPosition: 'center',
-  }}
+  leftSwipeIcon={<XIcon />}
+  rightSwipeIcon={<HeartIcon />}
+  upSwipeIcon={<StarIcon />}
+  leftSwipeIconStyle={{ backgroundColor: 'red' }}
+  rightSwipeIconStyle={{ backgroundColor: 'green' }}
+  upSwipeIconStyle={{ backgroundColor: 'blue' }}
   gestures={{
-    enableUpSwipe: true, // Super like
+    swipeDirections: ['left', 'right', 'up'], // Left: pass, Right: like, Up: super like
+    enableRotation: true,
   }}
   animations={{
     rotationEnabled: true,
     duration: 250,
+  }}
+  onSwipe={(direction, profile, index) => {
+    if (direction === 'right') console.log('Liked:', profile.name);
+    if (direction === 'left') console.log('Passed:', profile.name);
+    if (direction === 'up') console.log('Super liked:', profile.name);
+  }}
+  onTap={(profile, index) => {
+    // Show profile details
+    navigation.navigate('ProfileDetails', { profile });
   }}
 />
 ```
@@ -187,16 +218,22 @@ const [currentIndex, setCurrentIndex] = useState(0);
 <SwipeableCardsStack
   data={products}
   renderCard={renderProduct}
-  modal={{
-    modalTrigger: 'upSwipe',
-    modalPosition: 'bottom',
-  }}
+  leftSwipeIcon={<TrashIcon />}
+  rightSwipeIcon={<CartIcon />}
+  upSwipeIcon={<InfoIcon />}
   gestures={{
-    enableDownSwipe: true, // Remove from cart
+    swipeDirections: ['left', 'right', 'up'], // Left: remove, Right: add to cart, Up: details
   }}
   stackBehavior={{
     stackSize: 3,
-    stackOffset: { y: -10 },
+  }}
+  onSwipe={(direction, product, index) => {
+    if (direction === 'right') addToCart(product);
+    if (direction === 'left') removeFromWishlist(product);
+  }}
+  onTap={(product, index) => {
+    // Show product details
+    navigation.navigate('ProductDetails', { product });
   }}
 />
 ```
@@ -206,18 +243,21 @@ const [currentIndex, setCurrentIndex] = useState(0);
 <SwipeableCardsStack
   data={gameCards}
   renderCard={renderGameCard}
+  gestures={{
+    swipeDirections: ['left', 'right'], // Only horizontal swipes for card games
+    enableRotation: false,
+    enableScale: true,
+  }}
   animations={{
     rotationEnabled: false,
     scaleEnabled: true,
   }}
   stackBehavior={{
     stackSize: 5,
-    stackOffset: { x: 0, y: -20 },
-    stackScale: [1, 0.95, 0.9, 0.85, 0.8],
   }}
-  gestures={{
-    enableUpSwipe: false,
-    enableDownSwipe: false,
+  onSwipe={(direction, card, index) => {
+    if (direction === 'right') playCard(card);
+    if (direction === 'left') discardCard(card);
   }}
 />
 ```

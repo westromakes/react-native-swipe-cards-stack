@@ -71,6 +71,8 @@ export interface SwipeCallbacks {
   onStackEmpty?: () => void;
   onCardFocus?: (item: SwipeableCardData, index: number) => void;
   onAnimationComplete?: (direction: 'left' | 'right' | 'up' | 'down', item: SwipeableCardData) => void;
+  onTap?: (item: SwipeableCardData, index: number) => void;
+  onEmpty?: () => void;
 }
 
 export interface SwipeGestures {
@@ -148,6 +150,10 @@ export interface SwipeableCardsStackProps {
   // Legacy callbacks (for backward compatibility)
   onSwipe?: (direction: 'left' | 'right' | 'up' | 'down', item: SwipeableCardData, index: number) => void;
   
+  // Tap functionality
+  onTap?: (item: SwipeableCardData, index: number) => void;
+  tapActiveOpacity?: number;
+  
   // Gestures
   gestures?: SwipeGestures;
   
@@ -165,7 +171,6 @@ export interface SwipeableCardsStackProps {
   // Legacy props (for backward compatibility)
   enableUpSwipe?: boolean;
   rotationEnabled?: boolean;
-  scaleSecondCard?: boolean;
   animationDuration?: number;
   stackSize?: number;
 }

@@ -42,9 +42,10 @@ const SwipeableCardsStack: React.FC<SwipeableCardsStackProps> = (props) => {
     downSwipeIconStyle,
     // Legacy props for backward compatibility
     onSwipe,
+    onTap,
+    tapActiveOpacity,
     enableUpSwipe,
     rotationEnabled,
-    // scaleSecondCard, // TODO: implement second card scaling
     animationDuration,
     stackSize,
   } = mergedProps;
@@ -204,6 +205,8 @@ const SwipeableCardsStack: React.FC<SwipeableCardsStackProps> = (props) => {
           isTop={isTop}
           isActive={isActive}
           onSwipe={handleSwipe}
+          onTap={onTap}
+          tapActiveOpacity={tapActiveOpacity}
           animatedValue={animatedValue}
           cardStyle={calculatedCardStyle}
           swipeIcons={swipeIcons}
